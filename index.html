@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="royal-background"> 
+    
+    <nav>
+        <div class="container nav-container">
+            <h3 class="nav-brand"><a href="#" id="home-link">MyTracker</a></h3>
+            <div class="nav-links">
+                <a href="#" class="nav-link" id="tracker-link">Expense Tracker</a>
+                <a href="#" class="nav-link" id="savings-link">Savings Tracker</a>
+                <a href="#" class="nav-link" id="stories-link">Story Writing</a>
+            </div>
+            <div> <!-- Group logout and potential user name -->
+                 <span id="user-display-name" class="user-name-display"></span>
+                 <button id="logout-button">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container">
+
+        <!-- ===== HOME Section (Visible by default) ===== -->
+        <section id="home-view" class="view-section">
+             <h1 id="welcome-message">Welcome!</h1>
+             <p class="quote" id="quote-home">Loading quote...</p>
+             <div class="description-box card">
+                <h2>About MyTracker</h2>
+                <p><strong>English:</strong> Welcome to MyTracker, your personal space to manage expenses, track savings, and write stories. Take control of your finances and creativity all in one place.</p>
+                <hr>
+                <p><strong>தமிழ்:</strong> MyTracker-க்கு வரவேற்கிறோம், இது உங்கள் செலவுகளை நிர்வகிக்கவும், சேமிப்புகளைக் கண்காணிக்கவும், கதைகளை எழுதவும் உங்களுக்கான தனிப்பட்ட இடமாகும். உங்கள் நிதி மற்றும் படைப்பாற்றலை ஒரே இடத்தில் கட்டுப்படுத்துங்கள்.</p>
+             </div>
+        </section>
+
+        <!-- ===== EXPENSE TRACKER Section (HIDDEN) ===== -->
+        <section id="expense-tracker-view" class="view-section hidden">
+            <h2>Expense Tracker</h2>
+            <p class="quote" id="quote-tracker">Loading quote...</p>
+
+            <div class="action-header">
+                 <button id="add-expense-modal-button" class="button">Add New Expense</button>
+            </div>
+
+            <!-- Stats Grid -->
+            <h3>At a Glance</h3>
+            <div class="stats-grid">
+                <article class="stat-card"><h4>Weekly</h4><p id="weekly-total-expense">₹0.00</p></article>
+                <article class="stat-card"><h4>Monthly</h4><p id="monthly-total-expense">₹0.00</p></article>
+                <article class="stat-card"><h4>Yearly</h4><p id="yearly-total-expense">₹0.00</p></article>
+            </div>
+
+            <!-- Main Content Grid for Expenses -->
+            <div class="main-grid">
+                <section>
+                    <h3>Recent Expenses</h3>
+                    <ul id="expense-list" class="item-list"></ul>
+                </section>
+                <section>
+                    <h3>Category Breakdown</h3>
+                    <article class="card chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </article>
+                </section>
+            </div> 
+        </section> 
+
+        <!-- ===== SAVINGS TRACKER Section (HIDDEN) ===== -->
+        <section id="savings-tracker-view" class="view-section hidden">
+            <h2>Savings Tracker</h2>
+             <p class="quote" id="quote-savings">Keep saving!</p> <!-- Add specific quotes if desired -->
+
+             <div class="action-header">
+                 <button id="add-saving-modal-button" class="button">Add New Saving</button>
+            </div>
+
+            <!-- Stats Grid -->
+            <h3>Totals</h3>
+            <div class="stats-grid">
+                 <article class="stat-card"><h4>Weekly</h4><p id="weekly-total-saving">₹0.00</p></article>
+                 <article class="stat-card"><h4>Monthly</h4><p id="monthly-total-saving">₹0.00</p></article>
+                 <article class="stat-card"><h4>Yearly</h4><p id="yearly-total-saving">₹0.00</p></article>
+            </div>
+
+            <!-- Main Content Grid for Savings -->
+            <div class="main-grid">
+                 <section>
+                    <h3>Recent Savings</h3>
+                    <ul id="saving-list" class="item-list"></ul>
+                 </section>
+                 <section>
+                    <h3>Category Breakdown</h3>
+                     <article class="card chart-container">
+                         <canvas id="savingChart"></canvas>
+                     </article>
+                 </section>
+            </div>
+        </section>
+
+        <!-- ===== STORY LIST Section (HIDDEN) ===== -->
+        <section id="story-list-view" class="view-section hidden">
+             <div class="story-header">
+                 <h2>Saved Stories</h2>
+                 <a href="writer.html" class="button">Write a New Story</a>
+             </div>
+             <div id="story-list" class="story-list"></div>
+        </section>
+
+    </main>
+
+    <footer>
+         <a href="contact.html" class="footer-contact-link">Contact Us</a>
+        <p>&copy; 2025 (created by j.Girish). All rights reserved.</p>
+    </footer>
+
+    <!-- MODALS (Hidden by default) -->
+
+    <!-- Add/Edit Expense Modal -->
+    <div id="expense-modal" class="modal hidden">
+        <div class="modal-content card">
+            <button class="modal-close-button" onclick="closeModal('expense-modal')">&times;</button>
+            <h2 id="expense-modal-title">Add New Expense</h2>
+            <form id="expense-form">
+                <input type="hidden" id="expense-id"> 
+                <label for="expense-description">Description</label>
+                <input type="text" id="expense-description" required>
+                <label for="expense-amount">Amount (₹)</label>
+                <input type="number" id="expense-amount" min="0.01" step="0.01" required>
+                <label for="expense-date">Date</label>
+                <input type="date" id="expense-date" required>
+                <label for="expense-category">Category</label>
+                <select id="expense-category" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Food & Dining">Food & Dining</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Housing / Rent">Housing / Rent</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health & Fitness">Health & Fitness</option>
+                    <option value="Education">Education</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Investments">Investments</option>
+                    <option value="Savings">Savings (as expense?)</option>
+                    <option value="Bills & Subscriptions">Bills & Subscriptions</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Personal Care">Personal Care</option>
+                    <option value="Gifts & Donations">Gifts & Donations</option>
+                    <option value="Taxes">Taxes</option>
+                    <option value="Loans / EMI">Loans / EMI</option>
+                    <option value="Pets">Pets</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
+                <button type="submit">Save Expense</button>
+            </form>
+        </div>
+    </div>
+
+     <!-- Add/Edit Saving Modal -->
+    <div id="saving-modal" class="modal hidden">
+        <div class="modal-content card">
+            <button class="modal-close-button" onclick="closeModal('saving-modal')">&times;</button>
+            <h2 id="saving-modal-title">Add New Saving</h2>
+            <form id="saving-form">
+                <input type="hidden" id="saving-id"> 
+                <label for="saving-description">Description</label>
+                <input type="text" id="saving-description" required>
+                <label for="saving-amount">Amount (₹)</label>
+                <input type="number" id="saving-amount" min="0.01" step="0.01" required>
+                <label for="saving-date">Date</label>
+                <input type="date" id="saving-date" required>
+                 <label for="saving-category">Category (Optional)</label>
+                 <select id="saving-category">
+                     <option value="">Select a category (optional)</option>
+                     <option value="Goal">Goal</option>
+                     <option value="Emergency Fund">Emergency Fund</option>
+                     <option value="Investment">Investment</option>
+                     <option value="General">General</option>
+                     <option value="Other">Other</option>
+                 </select>
+                <button type="submit">Save Saving</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load main script -->
+    <script type="module" src="js/main.js"></script> 
+    <!-- Helper functions for modals -->
+    <script>
+        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+    </script>
+</body>
+</html>

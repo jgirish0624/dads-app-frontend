@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Story Writer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <div class="container nav-container">
+            <h3><a href="dashboard.html" class="nav-link">MyTracker</a></h3>
+            <button id="logout-button">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1 id="writer-title">Write a New Story</h1>
+        
+        <article class="card" id="story-editor-card">
+            <form id="story-form">
+                <!-- This is hidden. It holds the story ID for editing. -->
+                <input type="hidden" id="story-id"> 
+                
+                <label for="story-title">Story Title</label>
+                <input type="text" id="story-title" placeholder="Your story title..." required>
+                
+                <label for="story-cover">Cover Image URL (Optional)</label>
+                <input type="text" id="story-cover" placeholder="http://... (find an image online and paste the URL)">
+                
+                <label for="story-content">Content</label>
+                <textarea id="story-content" rows="15" placeholder="Write your story..."></textarea>
+                
+                <div class="button-group">
+                    <button type="submit" id="save-story-button">Save Story</button>
+                    <!-- Delete button is hidden until we are editing -->
+                    <button type="button" id="delete-story-button" class="delete-btn" style="display: none;">Delete Story</button>
+                </div>
+            </form>
+        </article>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 (created by j.Girish). All rights reserved.</p>
+    </footer>
+
+    <!-- Load scripts at the bottom -->
+    <script type="module" src="js/writer.js"></script>
+</body>
+</html>
