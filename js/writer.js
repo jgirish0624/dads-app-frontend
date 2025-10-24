@@ -1,6 +1,8 @@
 // --- 1. GLOBAL SETUP ---
 const token = localStorage.getItem('access_token');
-const API_URL = 'http://localhost:3000'; // Your backend URL
+// !!! IMPORTANT: REPLACE WITH YOUR LIVE RENDER URL BEFORE FINAL DEPLOYMENT !!!
+const API_URL = 'https://dads-app-backend.onrender.com'; // Use your Render URL or 'http://localhost:3000' for local testing
+const headers = { 'Authorization': `Bearer ${token}` };
 
 // Get all the HTML elements
 const storyForm = document.getElementById('story-form');
@@ -15,105 +17,116 @@ const logoutButton = document.getElementById('logout-button');
 let currentStoryId = null;
 
 // --- 2. SECURITY CHECK ---
-if (!token) {
-    window.location.href = 'login.html';
-}
+if (!token) { window.location.href = 'login.html'; }
 
-// --- 3. PAGE LOAD LOGIC (Check for Edit) ---
-document.addEventListener('DOMContentLoaded', () => {
-    // This is how we read the URL, e.g., "writer.html?id=123"
+// --- 3. MATERIALIZE INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        // Initialize Materialize Textarea (for auto-resize)
+        const textareas = document.querySelectorAll('.materialize-textarea');
+        if (textareas.length > 0) M.textareaAutoResize(textareas[0]); // Initialize the specific textarea
+
+        // Initialize labels
+        M.updateTextFields();
+
+        loadPageData(); // Start page load logic AFTER initializing
+    } catch (error) {
+        console.error("Materialize Init Error (Writer):", error);
+        alert("Error initializing page components. Please refresh.");
+    }
+});
+
+// --- 4. PAGE LOAD LOGIC ---
+function loadPageData() {
     const params = new URLSearchParams(window.location.search);
     const storyId = params.get('id');
 
     if (storyId) {
-        // If an ID exists, we are in "Edit Mode"
         currentStoryId = storyId;
         writerTitle.textContent = 'Edit Your Story';
-        deleteButton.style.display = 'block'; // Show delete button
+        deleteButton.style.display = 'inline-block';
         loadStoryForEditing(storyId);
     } else {
-        // We are in "Create Mode"
         writerTitle.textContent = 'Write a New Story';
+         M.updateTextFields(); // Ensure labels are correct for new story
     }
-});
-
-// 4. LOAD STORY DATA (if editing)
-async function loadStoryForEditing(id) {
-    const response = await fetch(`${API_URL}/stories/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) {
-        alert('Could not load story.');
-        window.location.href = 'index.html';
-        return;
-    }
-    const story = await response.json();
-    
-    // Fill the form with the data
-    storyIdInput.value = story.id;
-    storyTitleInput.value = story.title;
-    storyContentInput.value = story.content;
-    storyCoverInput.value = story.cover_image_url;
 }
 
-// --- 5. SAVE/UPDATE STORY ---
+// 5. LOAD STORY DATA (if editing)
+async function loadStoryForEditing(id) {
+    try {
+        const response = await fetch(`${API_URL}/stories/${id}`, { headers });
+        if (!response.ok) throw new Error('Could not load story');
+
+        const story = await response.json();
+
+        // Fill the form
+        storyIdInput.value = story.id;
+        storyTitleInput.value = story.title;
+        storyContentInput.value = story.content || '';
+        storyCoverInput.value = story.cover_image_url || '';
+
+        // Update labels and textarea AFTER filling inputs
+        M.updateTextFields();
+        if (story.content) M.textareaAutoResize(storyContentInput);
+
+    } catch (error) {
+        console.error("Error loading story:", error);
+        M.toast({html: `Error loading story: ${error.message}`, classes: 'red'});
+    }
+}
+
+// --- 6. SAVE/UPDATE STORY ---
 storyForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const storyData = {
         title: storyTitleInput.value,
         content: storyContentInput.value,
-        cover_image_url: storyCoverInput.value
+        cover_image_url: storyCoverInput.value || null
     };
-    
-    let url = `${API_URL}/stories`;
-    let method = 'POST'; // Create new
 
+    let url = `${API_URL}/stories`;
+    let method = 'POST';
     if (currentStoryId) {
-        // If we have an ID, we are UPDATING (PUT)
         url = `${API_URL}/stories/${currentStoryId}`;
         method = 'PUT';
     }
 
-    const response = await fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(storyData)
-    });
+    try {
+        const response = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(storyData) });
+        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
-    if (response.ok) {
-        alert('Story saved!');
-        // Go back to the dashboard to see the list
-        window.location.href = 'index.html';
-    } else {
-        alert('Failed to save story.');
+        M.toast({html: 'Story saved!', classes: 'green'});
+        window.location.href = 'index.html#story-list-view'; // Go back to dashboard story section
+
+    } catch (error) {
+        console.error('Failed to save story:', error);
+        M.toast({html: `Failed to save story: ${error.message}`, classes: 'red'});
     }
 });
 
-// --- 6. DELETE STORY ---
+// --- 7. DELETE STORY ---
 deleteButton.addEventListener('click', async () => {
-    if (!currentStoryId || !confirm('Are you sure you want to delete this story?')) {
-        return;
-    }
+    if (!currentStoryId || !confirm('Are you sure? This cannot be undone.')) return;
 
-    const response = await fetch(`${API_URL}/stories/${currentStoryId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+        const response = await fetch(`${API_URL}/stories/${currentStoryId}`, { method: 'DELETE', headers });
+        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
-    if (response.ok) {
-        alert('Story deleted.');
-        window.location.href = 'index.html';
-    } else {
-        alert('Failed to delete story.');
+        M.toast({html: 'Story deleted.', classes: 'green'});
+        window.location.href = 'index.html#story-list-view';
+
+    } catch (error) {
+        console.error('Failed to delete story:', error);
+        M.toast({html: `Failed to delete story: ${error.message}`, classes: 'red'});
     }
 });
 
-// --- 7. LOGOUT ---
+// --- 8. LOGOUT ---
 logoutButton.addEventListener('click', () => {
     localStorage.removeItem('access_token');
     window.location.href = 'login.html';
 });
+
+// NOTE: Initial load logic is now triggered by DOMContentLoaded

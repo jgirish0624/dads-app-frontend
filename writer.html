@@ -2,48 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport Tag -->
     <title>Story Writer</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Your Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav>
-        <div class="container nav-container">
-            <h3><a href="dashboard.html" class="nav-link">MyTracker</a></h3>
-            <button id="logout-button">Logout</button>
+    <nav class="nav-extended blue"> <!-- Use a standard color -->
+        <div class="nav-wrapper container">
+            <a href="index.html" class="brand-logo">MyTracker</a> <!-- Link back to main app -->
+            <ul class="right">
+                <li><a href="#" id="logout-button" class="btn red darken-2 waves-effect waves-light">Logout</a></li>
+            </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <h1 id="writer-title">Write a New Story</h1>
-        
-        <article class="card" id="story-editor-card">
-            <form id="story-form">
-                <!-- This is hidden. It holds the story ID for editing. -->
-                <input type="hidden" id="story-id"> 
-                
-                <label for="story-title">Story Title</label>
-                <input type="text" id="story-title" placeholder="Your story title..." required>
-                
-                <label for="story-cover">Cover Image URL (Optional)</label>
-                <input type="text" id="story-cover" placeholder="http://... (find an image online and paste the URL)">
-                
-                <label for="story-content">Content</label>
-                <textarea id="story-content" rows="15" placeholder="Write your story..."></textarea>
-                
-                <div class="button-group">
-                    <button type="submit" id="save-story-button">Save Story</button>
-                    <!-- Delete button is hidden until we are editing -->
-                    <button type="button" id="delete-story-button" class="delete-btn" style="display: none;">Delete Story</button>
-                </div>
-            </form>
-        </article>
+    <main class="container main-content">
+        <h4 id="writer-title" class="center-align">Write a New Story</h4>
+
+        <div class="card z-depth-1">
+            <div class="card-content">
+                <form id="story-form" class="col s12">
+                    <input type="hidden" id="story-id">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input type="text" id="story-title" required class="validate">
+                            <label for="story-title">Story Title</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                         <div class="input-field col s12">
+                            <input type="url" id="story-cover" placeholder="(Optional) https://...">
+                             <label for="story-cover">Cover Image URL</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <textarea id="story-content" class="materialize-textarea"></textarea>
+                            <label for="story-content">Content</label>
+                        </div>
+                    </div>
+                </form>
+             </div>
+             <div class="card-action right-align">
+                <button type="button" id="delete-story-button" class="btn waves-effect waves-light red darken-2" style="display: none; margin-right: 10px;">Delete</button>
+                <button type="submit" form="story-form" id="save-story-button" class="btn waves-effect waves-light blue">Save Story</button>
+             </div>
+        </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 (created by j.Girish). All rights reserved.</p>
+    <footer class="page-footer blue"> <!-- Match nav color -->
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 (created by j.Girish). All rights reserved.
+            </div>
+        </div>
     </footer>
 
-    <!-- Load scripts at the bottom -->
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Your Writer Script -->
     <script type="module" src="js/writer.js"></script>
 </body>
 </html>

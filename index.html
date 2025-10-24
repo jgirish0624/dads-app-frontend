@@ -4,199 +4,274 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyTracker</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Your Custom Styles -->
     <link rel="stylesheet" href="style.css">
-    <!-- Include Chart.js library -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="royal-background"> 
-    
-    <nav>
-        <div class="container nav-container">
-            <h3 class="nav-brand"><a href="#" id="home-link">MyTracker</a></h3>
-            <div class="nav-links">
-                <a href="#" class="nav-link" id="tracker-link">Expense Tracker</a>
-                <a href="#" class="nav-link" id="savings-link">Savings Tracker</a>
-                <a href="#" class="nav-link" id="stories-link">Story Writing</a>
-            </div>
-            <div> <!-- Group logout and potential user name -->
-                 <span id="user-display-name" class="user-name-display"></span>
-                 <button id="logout-button">Logout</button>
-            </div>
+    <nav class="nav-extended royal-nav">
+        <div class="nav-wrapper container">
+            <a href="#" id="home-link" class="brand-logo">MyTracker</a>
+            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="#" class="nav-link" id="tracker-link">Expenses</a></li>
+                <li><a href="#" class="nav-link" id="savings-link">Savings</a></li>
+                <li><a href="#" class="nav-link" id="stories-link">Stories</a></li>
+                <li><span id="user-display-name" class="user-name-display"></span></li>
+                <li><a href="#" id="logout-button" class="btn red darken-2 waves-effect waves-light">Logout</a></li>
+            </ul>
         </div>
     </nav>
 
+    <!-- Mobile Sidenav -->
+    <ul class="sidenav royal-nav" id="mobile-nav">
+        <li><h5 class="sidenav-header white-text">Navigation</h5></li>
+        <li><a href="#" class="nav-link sidenav-close white-text" id="tracker-link-mobile">Expenses</a></li>
+        <li><a href="#" class="nav-link sidenav-close white-text" id="savings-link-mobile">Savings</a></li>
+        <li><a href="#" class="nav-link sidenav-close white-text" id="stories-link-mobile">Stories</a></li>
+        <li><div class="divider"></div></li>
+        <li><a href="#" id="logout-button-mobile" class="btn red darken-2 waves-effect waves-light sidenav-close" style="width: 80%; margin: 10px auto; display: block;">Logout</a></li>
+    </ul>
+
     <!-- Main Content Area -->
-    <main class="container">
-
-        <!-- ===== HOME Section (Visible by default) ===== -->
+    <main class="container main-content">
+        <!-- ===== HOME Section ===== -->
         <section id="home-view" class="view-section">
-             <h1 id="welcome-message">Welcome!</h1>
-             <p class="quote" id="quote-home">Loading quote...</p>
-             <div class="description-box card">
-                <h2>About MyTracker</h2>
+            <h3 id="welcome-message" class="center-align welcome-title">Welcome!</h3>
+            <p class="center-align quote" id="quote-home">Loading quote...</p>
+            <div class="description-box card-panel royal-card-panel">
+                <h5 class="center-align">About MyTracker</h5>
                 <p><strong>English:</strong> Welcome to MyTracker, your personal space to manage expenses, track savings, and write stories. Take control of your finances and creativity all in one place.</p>
-                <hr>
+                <div class="divider"></div>
                 <p><strong>தமிழ்:</strong> MyTracker-க்கு வரவேற்கிறோம், இது உங்கள் செலவுகளை நிர்வகிக்கவும், சேமிப்புகளைக் கண்காணிக்கவும், கதைகளை எழுதவும் உங்களுக்கான தனிப்பட்ட இடமாகும். உங்கள் நிதி மற்றும் படைப்பாற்றலை ஒரே இடத்தில் கட்டுப்படுத்துங்கள்.</p>
-             </div>
+            </div>
         </section>
 
-        <!-- ===== EXPENSE TRACKER Section (HIDDEN) ===== -->
+        <!-- ===== EXPENSE TRACKER Section ===== -->
         <section id="expense-tracker-view" class="view-section hidden">
-            <h2>Expense Tracker</h2>
-            <p class="quote" id="quote-tracker">Loading quote...</p>
+            <h4 class="center-align">Expense Tracker</h4>
+            <p class="center-align quote" id="quote-tracker">Loading quote...</p>
 
-            <div class="action-header">
-                 <button id="add-expense-modal-button" class="button">Add New Expense</button>
+            <!-- Floating Action Button -->
+            <div class="fixed-action-btn">
+                <a id="add-expense-modal-button" class="btn-floating btn-large waves-effect waves-light blue modal-trigger" href="#expense-modal" title="Add New Expense"><i class="material-icons">add</i></a>
             </div>
 
-            <!-- Stats Grid -->
-            <h3>At a Glance</h3>
-            <div class="stats-grid">
-                <article class="stat-card"><h4>Weekly</h4><p id="weekly-total-expense">₹0.00</p></article>
-                <article class="stat-card"><h4>Monthly</h4><p id="monthly-total-expense">₹0.00</p></article>
-                <article class="stat-card"><h4>Yearly</h4><p id="yearly-total-expense">₹0.00</p></article>
+            <!-- Stats Row -->
+            <div class="row stats-row">
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Weekly</h6><p id="weekly-total-expense">₹0.00</p></div></div>
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Monthly</h6><p id="monthly-total-expense">₹0.00</p></div></div>
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Yearly</h6><p id="yearly-total-expense">₹0.00</p></div></div>
             </div>
 
-            <!-- Main Content Grid for Expenses -->
-            <div class="main-grid">
-                <section>
-                    <h3>Recent Expenses</h3>
-                    <ul id="expense-list" class="item-list"></ul>
-                </section>
-                <section>
-                    <h3>Category Breakdown</h3>
-                    <article class="card chart-container">
+            <!-- Content Row -->
+            <div class="row">
+                <div class="col s12 m7 l8"> 
+                    <h5>Recent Expenses</h5>
+                    <ul id="expense-list" class="collection item-list z-depth-1"></ul>
+                </div>
+                <div class="col s12 m5 l4"> 
+                    <h5>Category Breakdown</h5>
+                    <div class="card-panel chart-container z-depth-1">
                         <canvas id="expenseChart"></canvas>
-                    </article>
-                </section>
-            </div> 
-        </section> 
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <!-- ===== SAVINGS TRACKER Section (HIDDEN) ===== -->
+        <!-- ===== SAVINGS TRACKER Section ===== -->
         <section id="savings-tracker-view" class="view-section hidden">
-            <h2>Savings Tracker</h2>
-             <p class="quote" id="quote-savings">Keep saving!</p> <!-- Add specific quotes if desired -->
+            <h4 class="center-align">Savings Tracker</h4>
+            <p class="center-align quote" id="quote-savings">Keep saving!</p>
 
-             <div class="action-header">
-                 <button id="add-saving-modal-button" class="button">Add New Saving</button>
+            <div class="fixed-action-btn">
+                <a id="add-saving-modal-button" class="btn-floating btn-large waves-effect waves-light green modal-trigger" href="#saving-modal" title="Add New Saving"><i class="material-icons">add</i></a>
             </div>
 
-            <!-- Stats Grid -->
-            <h3>Totals</h3>
-            <div class="stats-grid">
-                 <article class="stat-card"><h4>Weekly</h4><p id="weekly-total-saving">₹0.00</p></article>
-                 <article class="stat-card"><h4>Monthly</h4><p id="monthly-total-saving">₹0.00</p></article>
-                 <article class="stat-card"><h4>Yearly</h4><p id="yearly-total-saving">₹0.00</p></article>
+            <!-- Stats Row -->
+            <div class="row stats-row">
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Weekly</h6><p id="weekly-total-saving">₹0.00</p></div></div>
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Monthly</h6><p id="monthly-total-saving">₹0.00</p></div></div>
+                <div class="col s12 m4"><div class="card-panel center-align stat-card z-depth-1"><h6>Yearly</h6><p id="yearly-total-saving">₹0.00</p></div></div>
             </div>
 
-            <!-- Main Content Grid for Savings -->
-            <div class="main-grid">
-                 <section>
-                    <h3>Recent Savings</h3>
-                    <ul id="saving-list" class="item-list"></ul>
-                 </section>
-                 <section>
-                    <h3>Category Breakdown</h3>
-                     <article class="card chart-container">
-                         <canvas id="savingChart"></canvas>
-                     </article>
-                 </section>
+            <!-- Content Row -->
+            <div class="row">
+                <div class="col s12 m7 l8"> 
+                    <h5>Recent Savings</h5>
+                    <ul id="saving-list" class="collection item-list z-depth-1"></ul>
+                </div>
+                <div class="col s12 m5 l4">
+                    <h5>Category Breakdown</h5>
+                    <div class="card-panel chart-container z-depth-1">
+                        <canvas id="savingChart"></canvas>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ===== STORY LIST Section (HIDDEN) ===== -->
+        <!-- ===== STORY LIST Section ===== -->
         <section id="story-list-view" class="view-section hidden">
-             <div class="story-header">
-                 <h2>Saved Stories</h2>
-                 <a href="writer.html" class="button">Write a New Story</a>
-             </div>
-             <div id="story-list" class="story-list"></div>
+            <div class="story-header">
+                <h4 class="center-align">Saved Stories</h4>
+                <a href="writer.html" class="btn waves-effect waves-light blue"><i class="material-icons left">edit</i>Write New Story</a>
+            </div>
+            <div id="story-list" class="row story-list">
+                <!-- Story cards go here -->
+            </div>
         </section>
-
     </main>
 
-    <footer>
-         <a href="contact.html" class="footer-contact-link">Contact Us</a>
-        <p>&copy; 2025 (created by j.Girish). All rights reserved.</p>
+    <footer class="page-footer royal-footer">
+        <div class="container">
+            <a href="contact.html" class="footer-contact-link grey-text text-lighten-3">Contact Us</a>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 (created by j.Girish). All rights reserved.
+            </div>
+        </div>
     </footer>
 
-    <!-- MODALS (Hidden by default) -->
-
-    <!-- Add/Edit Expense Modal -->
-    <div id="expense-modal" class="modal hidden">
-        <div class="modal-content card">
-            <button class="modal-close-button" onclick="closeModal('expense-modal')">&times;</button>
-            <h2 id="expense-modal-title">Add New Expense</h2>
-            <form id="expense-form">
-                <input type="hidden" id="expense-id"> 
-                <label for="expense-description">Description</label>
-                <input type="text" id="expense-description" required>
-                <label for="expense-amount">Amount (₹)</label>
-                <input type="number" id="expense-amount" min="0.01" step="0.01" required>
-                <label for="expense-date">Date</label>
-                <input type="date" id="expense-date" required>
-                <label for="expense-category">Category</label>
-                <select id="expense-category" required>
-                    <option value="" disabled selected>Select a category</option>
-                    <option value="Food & Dining">Food & Dining</option>
-                    <option value="Transportation">Transportation</option>
-                    <option value="Housing / Rent">Housing / Rent</option>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Groceries">Groceries</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Health & Fitness">Health & Fitness</option>
-                    <option value="Education">Education</option>
-                    <option value="Shopping">Shopping</option>
-                    <option value="Insurance">Insurance</option>
-                    <option value="Investments">Investments</option>
-                    <option value="Savings">Savings (as expense?)</option>
-                    <option value="Bills & Subscriptions">Bills & Subscriptions</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Personal Care">Personal Care</option>
-                    <option value="Gifts & Donations">Gifts & Donations</option>
-                    <option value="Taxes">Taxes</option>
-                    <option value="Loans / EMI">Loans / EMI</option>
-                    <option value="Pets">Pets</option>
-                    <option value="Miscellaneous">Miscellaneous</option>
-                </select>
-                <button type="submit">Save Expense</button>
+    <!-- Expense Modal -->
+    <div id="expense-modal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4 id="expense-modal-title">Add New Expense</h4>
+            <form id="expense-form" class="col s12">
+                <input type="hidden" id="expense-id">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="text" id="expense-description" required>
+                        <label for="expense-description">Description</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="number" id="expense-amount" min="0.01" step="0.01" required>
+                        <label for="expense-amount">Amount (₹)</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input type="text" id="expense-date" class="datepicker" required>
+                        <label for="expense-date">Date</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <select id="expense-category" required>
+                            <option value="" disabled selected>Select a category</option>
+                            <option value="Food & Dining">Food & Dining</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Housing / Rent">Housing / Rent</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Health & Fitness">Health & Fitness</option>
+                            <option value="Education">Education</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Insurance">Insurance</option>
+                            <option value="Investments">Investments</option>
+                            <option value="Savings">Savings (as expense)</option>
+                            <option value="Bills & Subscriptions">Bills & Subscriptions</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Personal Care">Personal Care</option>
+                            <option value="Gifts & Donations">Gifts & Donations</option>
+                            <option value="Taxes">Taxes</option>
+                            <option value="Loans / EMI">Loans / EMI</option>
+                            <option value="Pets">Pets</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                        </select>
+                        <label for="expense-category">Category</label>
+                    </div>
+                </div>
             </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" form="expense-form" class="waves-effect waves-green btn-flat">Save</button>
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancel</a>
         </div>
     </div>
 
-     <!-- Add/Edit Saving Modal -->
-    <div id="saving-modal" class="modal hidden">
-        <div class="modal-content card">
-            <button class="modal-close-button" onclick="closeModal('saving-modal')">&times;</button>
-            <h2 id="saving-modal-title">Add New Saving</h2>
-            <form id="saving-form">
-                <input type="hidden" id="saving-id"> 
-                <label for="saving-description">Description</label>
-                <input type="text" id="saving-description" required>
-                <label for="saving-amount">Amount (₹)</label>
-                <input type="number" id="saving-amount" min="0.01" step="0.01" required>
-                <label for="saving-date">Date</label>
-                <input type="date" id="saving-date" required>
-                 <label for="saving-category">Category (Optional)</label>
-                 <select id="saving-category">
-                     <option value="">Select a category (optional)</option>
-                     <option value="Goal">Goal</option>
-                     <option value="Emergency Fund">Emergency Fund</option>
-                     <option value="Investment">Investment</option>
-                     <option value="General">General</option>
-                     <option value="Other">Other</option>
-                 </select>
-                <button type="submit">Save Saving</button>
+    <!-- Saving Modal -->
+    <div id="saving-modal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4 id="saving-modal-title">Add New Saving</h4>
+            <form id="saving-form" class="col s12">
+                <input type="hidden" id="saving-id">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="text" id="saving-description" required>
+                        <label for="saving-description">Description</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="number" id="saving-amount" min="0.01" step="0.01" required>
+                        <label for="saving-amount">Amount (₹)</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input type="text" id="saving-date" class="datepicker" required>
+                        <label for="saving-date">Date</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <select id="saving-category">
+                            <option value="">Select a category (optional)</option>
+                            <option value="Goal">Goal</option>
+                            <option value="Emergency Fund">Emergency Fund</option>
+                            <option value="Investment">Investment</option>
+                            <option value="General">General</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <label for="saving-category">Category (Optional)</label>
+                    </div>
+                </div>
             </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" form="saving-form" class="waves-effect waves-green btn-flat">Save</button>
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancel</a>
         </div>
     </div>
 
-    <!-- Load main script -->
-    <script type="module" src="js/main.js"></script> 
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Your main script -->
+    <script type="module" src="js/main.js"></script>
+
     <!-- Helper functions for modals -->
     <script>
-        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
-        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+        function openModal(modalId) {
+            const elem = document.getElementById(modalId);
+            if (!elem) return console.error('Modal element not found:', modalId);
+            const instance = M.Modal.getInstance(elem);
+            if (instance) instance.open();
+            else console.error('Modal instance not found for', modalId);
+        }
+        function closeModal(modalId) {
+            const elem = document.getElementById(modalId);
+            if (!elem) return console.error('Modal element not found:', modalId);
+            const instance = M.Modal.getInstance(elem);
+            if (instance) instance.close();
+            else console.error('Modal instance not found for', modalId);
+        }
+
+        // ✅ Initialize Datepicker
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+            const dateElems = document.querySelectorAll('.datepicker');
+            M.Datepicker.init(dateElems, {
+                format: 'dd/mm/yyyy',
+                autoClose: true,
+                yearRange: 10
+            });
+        });
     </script>
 </body>
 </html>

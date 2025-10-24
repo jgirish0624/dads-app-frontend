@@ -2,43 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport Tag -->
     <title>Contact Us</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Your Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav>
-        <div class="container nav-container">
-            <h3 class="nav-brand"><a href="index.html">MyTracker</a></h3> 
-            <!-- Add other nav links if needed, or keep simple -->
-             <div class="nav-links">
-                 <a href="index.html" class="nav-link">Home</a>
-             </div>
+    <nav class="nav-extended blue">
+        <div class="nav-wrapper container">
+            <a href="index.html" class="brand-logo">MyTracker</a>
+            <ul class="right">
+                <li><a href="index.html">Home</a></li>
+            </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <h1>Contact & Info</h1>
-        
-        <article class="card contact-card">
-            <h2>Created By</h2>
-            <p>J. Girish</p>
+    <main class="container main-content">
+        <h4 class="center-align">Contact & Info</h4>
 
-            <h2>Report a Bug?</h2>
-            <p>If you encounter any issues or have suggestions, please send an email to:</p>
-            <p><a href="mailto:jgirish0624@gmail.com">jgirish0624@gmail.com</a></p>
-        </article>
+        <div class="card contact-card z-depth-1">
+            <div class="card-content">
+                <span class="card-title">Created By</span>
+                <p>J. Girish</p>
+
+                <div class="divider" style="margin: 20px 0;"></div>
+
+                <span class="card-title">Report a Bug?</span>
+                <p>If you encounter issues or have suggestions, please send an email to:</p>
+                <p><i class="material-icons left tiny">email</i><a href="mailto:jgirish0624@gmail.com">jgirish0624@gmail.com</a></p>
+            </div>
+        </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 (created by j.Girish). All rights reserved.</p>
+    <footer class="page-footer blue">
+         <div class="footer-copyright">
+            <div class="container">
+                © 2025 (created by j.Girish). All rights reserved.
+            </div>
+        </div>
     </footer>
 
-     <!-- Add logout functionality if needed -->
+     <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
      <script>
-        // Basic check if user is logged in (optional on contact page)
-        // const token = localStorage.getItem('access_token');
-        // if (!token) window.location.href = 'login.html'; 
+        // Optional: Initialize Materialize components if needed
+        // document.addEventListener('DOMContentLoaded', function() { M.AutoInit(); });
      </script>
 </body>
 </html>
