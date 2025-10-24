@@ -2,29 +2,32 @@
 const token = localStorage.getItem('access_token');
 // !!! IMPORTANT: Use 'http://localhost:3000' for local testing.
 // !!! CHANGE to your live Render URL before final Vercel deployment !!!
-const API_URL = 'https://dads-app-backend.onrender.com'; // Make sure this is correct
+const API_URL = 'https://dads-app-backend.onrender.com'; // Or your Render URL
 const headers = { 'Authorization': `Bearer ${token}` };
 
-// Global variables for elements, assigned in DOMContentLoaded
-let homeView, expenseTrackerView, savingsTrackerView, storyListView;
-let homeLink, trackerLink, savingsLink, storiesLink, trackerLinkMobile, savingsLinkMobile, storiesLinkMobile;
+// Global variables for elements - Initialized as null, assigned in DOMContentLoaded
+let homeView = null, expenseTrackerView = null, savingsTrackerView = null, storyListView = null;
+let homeLink = null, trackerLink = null, savingsLink = null, storiesLink = null, trackerLinkMobile = null, savingsLinkMobile = null, storiesLinkMobile = null;
 let views = [], navLinks = [];
-let logoutButton, logoutButtonMobile, welcomeMessage, quoteHomeEl, quoteTrackerEl, quoteSavingsEl, userDisplayNameEl;
-let addExpenseModalButton, expenseModalEl, expenseModalInstance, expenseForm, expenseListEl;
-let weeklyTotalExpenseEl, monthlyTotalExpenseEl, yearlyTotalExpenseEl;
+let logoutButton = null, logoutButtonMobile = null, welcomeMessage = null, quoteHomeEl = null, quoteTrackerEl = null, quoteSavingsEl = null, userDisplayNameEl = null;
+let addExpenseModalButton = null, expenseModalEl = null, expenseModalInstance = null, expenseForm = null, expenseListEl = null;
+let weeklyTotalExpenseEl = null, monthlyTotalExpenseEl = null, yearlyTotalExpenseEl = null;
 let expenseChartCanvas = null, expenseChart = null;
-let addSavingModalButton, savingModalEl, savingModalInstance, savingForm, savingListEl;
-let weeklyTotalSavingEl, monthlyTotalSavingEl, yearlyTotalSavingEl;
+let addSavingModalButton = null, savingModalEl = null, savingModalInstance = null, savingForm = null, savingListEl = null;
+let weeklyTotalSavingEl = null, monthlyTotalSavingEl = null, yearlyTotalSavingEl = null;
 let savingChartCanvas = null, savingChart = null;
-let storyListEl;
-let allExpenses = []; let allSavings = []; let allStories = []; let currentUser = null;
+let storyListEl = null;
+let allExpenses = [], allSavings = [], allStories = [], currentUser = null;
 
 // --- 2. SECURITY CHECK ---
 if (!token) {
-    console.warn("No token found, redirecting to login.");
-    window.location.href = 'login.html'; // Redirect immediately
+    console.warn("Security Check: No token found, redirecting to login.");
+    // Redirect immediately if no token, stopping further script execution in this context
+    window.location.href = 'login.html';
+    // Throw an error to potentially halt further non-async script execution if needed, though redirect is usually sufficient
+    // throw new Error("Redirecting to login: No authentication token found.");
 } else {
-    console.log("Token found, proceeding with page load.");
+    console.log("Security Check: Token found, proceeding.");
 }
 
 // --- 3. QUOTES ---
@@ -35,18 +38,18 @@ function displayQuote() {
         const randomIndex = Math.floor(Math.random() * quotes.length);
         const quote = `"${quotes[randomIndex]}"`;
         // Check elements exist before setting text
-        if (quoteHomeEl) quoteHomeEl.textContent = quote; else console.warn("quoteHomeEl not found for quote");
-        if (quoteTrackerEl) quoteTrackerEl.textContent = quote; else console.warn("quoteTrackerEl not found for quote");
-        if (quoteSavingsEl) quoteSavingsEl.textContent = "சேமிப்பு பழக்கம் வாழ்க்கையின் வளம்."; else console.warn("quoteSavingsEl not found for quote");
+        if (quoteHomeEl) quoteHomeEl.textContent = quote; else console.warn("displayQuote: quoteHomeEl not found");
+        if (quoteTrackerEl) quoteTrackerEl.textContent = quote; else console.warn("displayQuote: quoteTrackerEl not found");
+        if (quoteSavingsEl) quoteSavingsEl.textContent = "சேமிப்பு பழக்கம் வாழ்க்கையின் வளம்."; else console.warn("displayQuote: quoteSavingsEl not found");
         console.log("Quote display attempt finished.");
     } catch (e) { console.error("Error displaying quote:", e); }
 }
 
 // --- 4. DOMContentLoaded: GET ELEMENTS, INITIALIZE MATERIALIZE, START APP ---
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM Loaded. Getting elements and initializing Materialize...");
+    console.log("DOM Loaded. Getting elements...");
 
-    // --- Assign Elements (Inside DOMContentLoaded) ---
+    // --- Assign Elements (Safely inside DOMContentLoaded) ---
     homeView = document.getElementById('home-view');
     expenseTrackerView = document.getElementById('expense-tracker-view');
     savingsTrackerView = document.getElementById('savings-tracker-view');
@@ -73,57 +76,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addExpenseModalButton = document.getElementById('add-expense-modal-button');
     expenseModalEl = document.getElementById('expense-modal');
-    expenseForm = document.getElementById('expense-form');
+    expenseForm = document.getElementById('expense-form'); // Form INSIDE modal
     expenseListEl = document.getElementById('expense-list');
     weeklyTotalExpenseEl = document.getElementById('weekly-total-expense');
     monthlyTotalExpenseEl = document.getElementById('monthly-total-expense');
     yearlyTotalExpenseEl = document.getElementById('yearly-total-expense');
     const expenseCtx = document.getElementById('expenseChart');
-    if (expenseCtx) expenseChartCanvas = expenseCtx.getContext('2d'); else console.error("Expense chart canvas element not found!");
+    if (expenseCtx) expenseChartCanvas = expenseCtx.getContext('2d'); else console.error("Expense chart canvas element (#expenseChart) not found!");
 
     addSavingModalButton = document.getElementById('add-saving-modal-button');
     savingModalEl = document.getElementById('saving-modal');
-    savingForm = document.getElementById('saving-form');
+    savingForm = document.getElementById('saving-form'); // Form INSIDE modal
     savingListEl = document.getElementById('saving-list');
     weeklyTotalSavingEl = document.getElementById('weekly-total-saving');
     monthlyTotalSavingEl = document.getElementById('monthly-total-saving');
     yearlyTotalSavingEl = document.getElementById('yearly-total-saving');
     const savingCtx = document.getElementById('savingChart');
-    if (savingCtx) savingChartCanvas = savingCtx.getContext('2d'); else console.error("Saving chart canvas element not found!");
+    if (savingCtx) savingChartCanvas = savingCtx.getContext('2d'); else console.error("Saving chart canvas element (#savingChart) not found!");
 
     storyListEl = document.getElementById('story-list');
-
-    // Check specific datepicker inputs
-    const expenseDateInput = document.getElementById('expense-date');
-    const savingDateInput = document.getElementById('saving-date');
-    console.log("Checked Elements - Expense Date Input Found:", expenseDateInput ? 'Yes' : 'No', expenseDateInput);
-    console.log("Checked Elements - Saving Date Input Found:", savingDateInput ? 'Yes' : 'No', savingDateInput);
+    console.log("Finished assigning elements.");
     // --- End Assign Elements ---
 
 
     // --- Initialize Materialize Components ---
     let materializeReady = false;
     try {
-        if (typeof M === 'undefined') {
-             console.error("Materialize JavaScript (M) is not loaded! Check script tag in HTML.");
-             alert("Error: UI Library failed to load. Please refresh.");
-             return; // Stop execution
+        if (typeof M === 'undefined' || !M) {
+             console.error("CRITICAL: Materialize JavaScript (M) is not defined! Check script tag order in HTML.");
+             alert("Error: UI Library failed to load. Ensure materialize.min.js is loaded AFTER materialize.min.css and BEFORE main.js.");
+             return; // Stop
         }
+        console.log("Materialize object (M) IS defined. Initializing components...");
 
-        console.log("Materialize object (M) found:", M);
-
-        // Init Modals (with simpler callback just for logging/label updates)
+        // Init Modals
         const modalElems = document.querySelectorAll('.modal');
         if (modalElems.length > 0) {
             M.Modal.init(modalElems, {
-                 // Removed onOpenEnd for datepicker, now done below
-                 onOpenEnd: function(modalElement) {
+                 onOpenEnd: function(modalElement) { // Callback when modal animation finishes
                      console.log("Modal opened:", modalElement.id);
-                     // Ensure labels are floating correctly after modal opens & potentially brief delay
-                     setTimeout(() => M.updateTextFields(), 50);
+                     // Ensure labels are floating correctly after modal opens
+                     M.updateTextFields();
                  }
             });
-            // Get instances after init
             if (expenseModalEl) expenseModalInstance = M.Modal.getInstance(expenseModalEl);
             if (savingModalEl) savingModalInstance = M.Modal.getInstance(savingModalEl);
             console.log(`Modals Initialized (${modalElems.length}).`);
@@ -136,61 +131,49 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Selects Initialized (${selectElems.length}).`);
         } else { console.warn("No select elements found."); }
 
-        // --- Datepicker Initialization (Now done reliably HERE) ---
+        // Init Datepickers
         const datepickerElems = document.querySelectorAll('.datepicker');
-        console.log(`Found ${datepickerElems.length} elements with class 'datepicker'.`);
+        console.log(`Found ${datepickerElems.length} datepicker elements.`);
         if (datepickerElems.length > 0) {
             try {
                 const datepickerInstances = M.Datepicker.init(datepickerElems, {
-                    format: 'yyyy-mm-dd', // Standard format
+                    format: 'yyyy-mm-dd',
                     autoClose: true,
-                    // container: document.body // Usually not needed, but for debugging
+                    container: document.body // Often helps with z-index issues in modals
                 });
-                console.log("M.Datepicker.init finished successfully.", datepickerInstances);
-                 // Verify instances were created right after init
-                 if(expenseDateInput) console.log("Expense Date Instance after init:", M.Datepicker.getInstance(expenseDateInput) ? 'Exists' : 'MISSING'); else console.warn("Expense date input missing for instance check");
-                 if(savingDateInput) console.log("Saving Date Instance after init:", M.Datepicker.getInstance(savingDateInput) ? 'Exists' : 'MISSING'); else console.warn("Saving date input missing for instance check");
-            } catch(dateError) {
-                 console.error("Error during M.Datepicker.init:", dateError);
-                 M.toast({html: 'Error initializing date pickers!', classes:'red'});
-            }
-        } else {
-            console.warn("No elements with class 'datepicker' found.");
-        }
-        // --- End Datepicker ---
+                console.log("M.Datepicker.init CALLED.", datepickerInstances);
+                datepickerElems.forEach(el => { // Verify instances right after
+                    console.log(`Instance for #${el.id || 'NO ID'}:`, M.Datepicker.getInstance(el) ? 'Exists' : 'MISSING!');
+                });
+            } catch(dateError) { console.error("Error DURING M.Datepicker.init:", dateError); M.toast({html: 'Error initializing date pickers!', classes:'red'}); }
+        } else { console.warn("No elements with class 'datepicker'. Check HTML class names."); }
 
         // Init Sidenav
         const sidenavElems = document.querySelectorAll('.sidenav');
         if (sidenavElems.length > 0) { M.Sidenav.init(sidenavElems); console.log(`Sidenav Initialized (${sidenavElems.length}).`); }
-        else { console.warn("No sidenav elements found."); }
+        else { console.warn("No sidenav elements."); }
 
         // Init FAB
         const fabElems = document.querySelectorAll('.fixed-action-btn');
         if (fabElems.length > 0) { M.FloatingActionButton.init(fabElems); console.log(`FAB Initialized (${fabElems.length}).`); }
-        else { console.warn("No FAB elements found."); }
+        else { console.warn("No FAB elements."); }
 
-        console.log("Materialize initialization attempt finished.");
+        console.log("Materialize initialization phase finished.");
         materializeReady = true;
 
-    } catch (error) {
-        console.error("Materialize Init Error:", error);
-        alert("Error initializing page components. Please refresh.");
-    }
+    } catch (error) { console.error("General Materialize Init Error:", error); alert("Error initializing page."); }
 
-    // Attach Navigation Listeners
-    attachNavListeners();
+    // Attach Nav & Form Listeners
+    attachNavListeners(); // Defined below
+    attachFormListeners(); // Defined below
 
-    // Attach Form Listeners
-    attachFormListeners();
-
-    // Start App Logic
+    // Start App Logic (only if token exists & UI ready)
     if (token && materializeReady) {
-        initializeApp();
+        initializeApp(); // Defined below
     } else {
-        console.error(`Initialization skipped: Token=${!!token}, MaterializeReady=${materializeReady}`);
-        if (!materializeReady && token) {
-             alert("Could not load UI components. App may not function correctly.");
-        }
+        console.error(`App Initialization SKIPPED: Token=${!!token}, MaterializeReady=${materializeReady}`);
+        if (!materializeReady && token) { alert("Could not load UI components."); }
+        // If no token, redirect should have already happened
     }
 
 }); // End DOMContentLoaded
@@ -198,9 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- 5. NAVIGATION LOGIC (SPA) ---
 function showView(viewToShow) {
-    if (!viewToShow) { console.error("showView called with invalid view element"); return; }
+    if (!viewToShow) { console.error("showView error: viewToShow is null/undefined"); return; }
     console.log("Switching view to:", viewToShow.id);
-    views.forEach(view => { if(view) view.classList.add('hidden'); });
+    views.forEach(view => { if(view) view.classList.add('hidden'); else console.warn("showView: A view element in the 'views' array is null"); });
     viewToShow.classList.remove('hidden');
 
     navLinks.forEach(link => { if(link && link.parentElement) link.parentElement.classList.remove('active'); });
@@ -225,24 +208,20 @@ function attachNavListeners() {
     if(trackerLinkMobile) trackerLinkMobile.addEventListener('click', (e) => { e.preventDefault(); showView(expenseTrackerView); }); else console.warn("trackerLinkMobile missing");
     if(savingsLinkMobile) savingsLinkMobile.addEventListener('click', (e) => { e.preventDefault(); showView(savingsTrackerView); }); else console.warn("savingsLinkMobile missing");
     if(storiesLinkMobile) storiesLinkMobile.addEventListener('click', (e) => { e.preventDefault(); showView(storyListView); }); else console.warn("storiesLinkMobile missing");
-    // Logout listeners
     if (logoutButton) logoutButton.addEventListener('click', handleLogout); else console.warn("logoutButton missing");
     if (logoutButtonMobile) logoutButtonMobile.addEventListener('click', handleLogout); else console.warn("logoutButtonMobile missing");
     console.log("Nav listeners attached.");
 }
 
 
-// --- 6. MODAL CONTROL ---
-// Triggering handled by Materialize classes/hrefs on buttons
-
-// --- 7. LOGOUT ---
+// --- 6. LOGOUT ---
 function handleLogout() {
     console.log("Logout action initiated.");
     localStorage.removeItem('access_token');
     window.location.href = 'login.html';
 }
 
-// --- 8. UPDATE WELCOME MESSAGE ---
+// --- 7. UPDATE WELCOME MESSAGE ---
 function updateWelcomeMessage() {
     if (!welcomeMessage || !userDisplayNameEl) { console.warn("Welcome elements missing."); return; }
     const name = currentUser?.user_metadata?.full_name;
@@ -254,11 +233,12 @@ function updateWelcomeMessage() {
     }
 }
 
-// --- 9. DELETE FUNCTIONS ---
+// --- 8. DELETE FUNCTIONS ---
 async function deleteExpense(id) {
     if (!confirm('Delete this expense?')) return;
     try {
-        const response = await fetch(`${API_URL}/expenses/${id}`, { method: 'DELETE', headers });
+        console.log(`Attempting to delete expense ID: ${id}`);
+        const response = await fetch(`${API_URL}/expenses/${id}`, { method: 'DELETE', headers }); // ID in path for DELETE
         if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
         M.toast({html: 'Expense deleted!', classes: 'green'});
         await fetchAndUpdateExpenses();
@@ -267,14 +247,15 @@ async function deleteExpense(id) {
 async function deleteSaving(id) {
      if (!confirm('Delete this saving?')) return;
      try {
-        const response = await fetch(`${API_URL}/savings/${id}`, { method: 'DELETE', headers });
+        console.log(`Attempting to delete saving ID: ${id}`);
+        const response = await fetch(`${API_URL}/savings/${id}`, { method: 'DELETE', headers }); // ID in path for DELETE
         if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
         M.toast({html: 'Saving deleted!', classes: 'green'});
         await fetchAndUpdateSavings();
      } catch (error) { console.error('Delete saving error:', error); M.toast({html: `Error deleting saving: ${error.message}`, classes: 'red'}); }
 }
 
-// --- 10. DISPLAY LIST (Generic) ---
+// --- 9. DISPLAY LIST (Generic) ---
 function displayList(items, listElement, deleteFunction, type) {
     if (!listElement) { console.error(`List element for ${type} not found!`); return; }
     listElement.innerHTML = '';
@@ -311,14 +292,14 @@ function displayList(items, listElement, deleteFunction, type) {
     });
 }
 
-// --- 11. CALCULATE STATS (Generic) ---
+// --- 10. CALCULATE STATS (Generic) ---
 function calculateAndDisplayStats(items, type) {
+    // ... (rest of function is the same, checks elements internally) ...
     const now = new Date();
     let startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - (now.getDay() || 7) + 1); startOfWeek.setHours(0,0,0,0);
     let weeklyTotal = 0, monthlyTotal = 0, yearlyTotal = 0;
-
-    for (const item of items) {
-        const amount = Number(item.amount) || 0; if (amount === 0) continue;
+    for (const item of items) { /* ... calculation logic ... */
+      const amount = Number(item.amount) || 0; if (amount === 0) continue;
         try {
             const itemDate = new Date(item.date); if (isNaN(itemDate.getTime())) continue;
             itemDate.setHours(0,0,0,0);
@@ -334,16 +315,16 @@ function calculateAndDisplayStats(items, type) {
     const weeklyEl = type === 'expense' ? weeklyTotalExpenseEl : weeklyTotalSavingEl;
     const monthlyEl = type === 'expense' ? monthlyTotalExpenseEl : monthlyTotalSavingEl;
     const yearlyEl = type === 'expense' ? yearlyTotalExpenseEl : yearlyTotalSavingEl;
-
     if (weeklyEl) weeklyEl.textContent = `₹${weeklyTotal.toFixed(2)}`; else console.warn(`Weekly total element for ${type} missing`);
     if (monthlyEl) monthlyEl.textContent = `₹${monthlyTotal.toFixed(2)}`; else console.warn(`Monthly total element for ${type} missing`);
     if (yearlyEl) yearlyEl.textContent = `₹${yearlyTotal.toFixed(2)}`; else console.warn(`Yearly total element for ${type} missing`);
 }
 
-// --- 12. UPDATE CHART (Generic) ---
+// --- 11. UPDATE CHART (Generic) ---
 function updateChart(items, canvasContext, chartInstance, type) {
      if (!canvasContext) { console.warn(`Canvas context for ${type} chart missing!`); return; }
-    const categoryTotals = items.reduce((acc, item) => {
+    // ... (rest of function is the same) ...
+     const categoryTotals = items.reduce((acc, item) => {
         const category = item.category || 'Uncategorized';
         const amount = Number(item.amount) || 0;
         acc[category] = (acc[category] || 0) + amount;
@@ -371,9 +352,10 @@ function updateChart(items, canvasContext, chartInstance, type) {
     }
 }
 
-// --- 13. DISPLAY STORY LIST ---
+// --- 12. DISPLAY STORY LIST ---
 function displayStoryList(stories) {
     if (!storyListEl) { console.error("Story list element not found!"); return; }
+    // ... (rest of function is the same) ...
     storyListEl.innerHTML = '';
     if (!stories || stories.length === 0) { storyListEl.innerHTML = `<p class="center-align grey-text col s12">You haven't written any stories yet.</p>`; return;}
     stories.forEach(story => {
@@ -389,7 +371,7 @@ function displayStoryList(stories) {
     });
 }
 
-// --- 14. DATA PROCESSING FUNCTIONS ---
+// --- 13. DATA PROCESSING FUNCTIONS ---
 function processExpenseData(expenses) {
     if(!Array.isArray(expenses)) expenses = [];
     displayList(expenses, expenseListEl, deleteExpense, 'expense');
@@ -403,7 +385,7 @@ function processSavingsData(savings) {
     if (savingChartCanvas) updateChart(savings, savingChartCanvas, savingChart, 'saving');
 }
 
-// --- 15. FETCH AND UPDATE FUNCTIONS ---
+// --- 14. FETCH AND UPDATE FUNCTIONS ---
 async function fetchAndUpdateExpenses() {
     console.log("Fetching latest expenses...");
     try {
@@ -425,7 +407,7 @@ async function fetchAndUpdateSavings() {
     } catch (error) { console.error("Error fetching/updating savings:", error); if (typeof M !== 'undefined') M.toast({html: "Could not update savings.", classes: 'red'}); }
 }
 
-// --- 16. ADD ITEM HANDLERS (Attach Listeners Separately) ---
+// --- 15. ADD ITEM HANDLERS (Attach Listeners Separately) ---
 function attachFormListeners() {
     console.log("Attaching form listeners...");
     if(expenseForm) {
@@ -438,7 +420,6 @@ function attachFormListeners() {
             const categorySelect = document.getElementById('expense-category');
             const category = categorySelect.value;
             const datepickerInstance = M.Datepicker.getInstance(dateInput);
-            // Get formatted date OR use the input value directly if instance failed
             const date = datepickerInstance ? datepickerInstance.toString('yyyy-mm-dd') : dateInput.value;
 
             if (!category) { M.toast({html: 'Please select category.', classes: 'orange'}); return; }
@@ -450,8 +431,8 @@ function attachFormListeners() {
                 if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
                 expenseForm.reset();
                 categorySelect.value = "";
-                if (typeof M !== 'undefined') M.FormSelect.init(categorySelect, {}); // Re-init select visually
-                if (expenseModalInstance) expenseModalInstance.close();
+                if (typeof M !== 'undefined' && M.FormSelect) M.FormSelect.init(categorySelect, {});
+                if (expenseModalInstance) expenseModalInstance.close(); else console.warn("Cannot close expense modal - instance not found");
                 M.toast({html: 'Expense added!', classes: 'green'});
                 await fetchAndUpdateExpenses();
             } catch (error) { console.error('Failed to add expense:', error); M.toast({html: `Failed to add expense: ${error.message}`, classes: 'red'}); }
@@ -478,8 +459,8 @@ function attachFormListeners() {
                  if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
                 savingForm.reset();
                 categorySelect.value = "";
-                if (typeof M !== 'undefined') M.FormSelect.init(categorySelect, {});
-                if (savingModalInstance) savingModalInstance.close();
+                if (typeof M !== 'undefined' && M.FormSelect) M.FormSelect.init(categorySelect, {});
+                if (savingModalInstance) savingModalInstance.close(); else console.warn("Cannot close saving modal - instance not found");
                 M.toast({html: 'Saving added!', classes: 'green'});
                 await fetchAndUpdateSavings();
             } catch (error) { console.error('Failed to add saving:', error); M.toast({html: `Failed to add saving: ${error.message}`, classes: 'red'}); }
@@ -488,7 +469,8 @@ function attachFormListeners() {
     console.log("Form listeners attached.");
 }
 
-// --- 17. INITIAL APP LOAD ---
+
+// --- 16. INITIAL APP LOAD ---
 async function initializeApp() {
     console.log("initializeApp called.");
     if (!token) { console.error("initializeApp aborted: No token."); return; }
@@ -541,6 +523,6 @@ async function initializeApp() {
     }
 }
 
-// --- 18. RUN ---
+// --- 17. RUN ---
 // NOTE: initializeApp is now called by the DOMContentLoaded listener.
 console.log("main.js script execution finished. Waiting for DOMContentLoaded.");
