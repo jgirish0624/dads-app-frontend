@@ -1,6 +1,6 @@
 // --- 1. GLOBAL SETUP ---
 const token = localStorage.getItem('access_token');
-const API_URL = 'http://localhost:3000'; // Your backend URL (CHANGE FOR DEPLOYMENT)
+const API_URL = 'https://dads-app-backend.onrender.com'; // Your backend URL (CHANGE FOR DEPLOYMENT)
 const headers = { 'Authorization': `Bearer ${token}` };
 
 // Page View Sections
